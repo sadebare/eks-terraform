@@ -1,8 +1,8 @@
 terraform {
   backend "s3" {
-    bucket       = var.backet_name
-    key          = var.statefile_bucket_path
-    region       = var.region
+    bucket       = "new-barry-terraform-statefile"
+    key          = "dev/terraform.tfstate"
+    region       = "us-east-1"
     use_lockfile = true
   }
 }
