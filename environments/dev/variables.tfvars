@@ -25,6 +25,9 @@ addons = [
   },
   {
     name = "aws-ebs-csi-driver"
+  },
+  {
+    name = "eks-pod-identity-agent"
   }
 ]
 desired_capacity_on_demand = 2
