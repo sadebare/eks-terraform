@@ -54,29 +54,29 @@ variable "tags" {
 
 variable "addons" {
   type = list(object({
-    name = string
+    name    = string
     version = string
   }))
 }
 
 variable "desired_capacity_on_demand" {
   description = "Desired capacity for on-demand node group"
-  type        = number  
+  type        = number
 }
 
 variable "max_capacity_on_demand" {
   description = "Maximum capacity for on-demand node group"
-  type        = number  
+  type        = number
 }
 
 variable "min_capacity_on_demand" {
   description = "Minimum capacity for on-demand node group"
-  type        = number  
+  type        = number
 }
 
 variable "desired_capacity_spot" {
   description = "Desired capacity of spot instances"
-  type = number
+  type        = number
 }
 
 variable "max_capacity_spot" {
@@ -91,7 +91,7 @@ variable "min_capacity_spot" {
 
 variable "spot_instance_types" {
   description = "spot instance types for the spot node group"
-  type = list(string)
+  type        = list(string)
 }
 
 variable "ondemand_instance_types" {
