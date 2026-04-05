@@ -1,4 +1,4 @@
-env_name                      = "uat"
+env_name                      = "demo-uat"
 region                        = "us-east-1"
 vpc_cidr                      = "172.53.0.0/16"
 number_of_nat                 = 3
@@ -6,7 +6,7 @@ private_subnet_cidr           = ["172.53.1.0/24", "172.53.2.0/24", "172.53.3.0/2
 public_subnet_cidr            = ["172.53.4.0/24", "172.53.5.0/24", "172.53.6.0/24"]
 bucket_name                   = "shittu-barry-terraform-state"
 statefile_bucket_path         = "dev/terraform.tfstate"
-eks_name                      = "uat-eks-cluster"
+eks_name                      = "demo-uat-eks-cluster"
 is_eks_role_enabled           = true
 is_eks_nodegroup_role_enabled = true
 is_alb_controller_enabled     = true
@@ -23,9 +23,9 @@ addons = [
   {
     name = "aws-efs-csi-driver"
   },
-  {
-    name = "aws-ebs-csi-driver"
-  },
+#   {
+#     name = "aws-ebs-csi-driver"
+#   },
   {
     name = "eks-pod-identity-agent"
   }
