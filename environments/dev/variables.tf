@@ -14,7 +14,7 @@ variable "is_alb_controller_enabled" {}
 variable "addons" {
   type = list(object({
     name    = string
-    version = string
+    version = optional(string)
   }))
 }
 
