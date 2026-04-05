@@ -55,7 +55,7 @@ variable "tags" {
 variable "addons" {
   type = list(object({
     name    = string
-    version = string
+    version = optional(string)
   }))
 }
 

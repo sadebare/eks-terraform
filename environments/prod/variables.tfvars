@@ -12,36 +12,27 @@ is_eks_nodegroup_role_enabled = true
 is_alb_controller_enabled     = true
 addons = [
   {
-    name    = "vpc-cni"
-    version = "v1.13.0-eksbuild.1"
+    name = "vpc-cni"
   },
   {
-    name    = "coredns"
-    version = "v1.13.0-eksbuild.1"
+    name = "coredns"
   },
   {
-    name    = "kube-proxy"
-    version = "v1.13.0-eksbuild.1"
+    name = "kube-proxy"
   },
   {
-    name    = "aws-load-balancer-controller"
-    version = "v2.4.7"
+    name = "aws-efs-csi-driver"
   },
   {
-    name    = "aws-efs-csi-driver"
-    version = "v2.2.0-eksbuild.1"
-  },
-  {
-    name    = "aws-ebs-csi-driver"
-    version = "v1.46.0-eksbuild.1"
+    name = "aws-ebs-csi-driver"
   }
 ]
 desired_capacity_on_demand = 2
-max_capacity_on_demand     = 1
+max_capacity_on_demand     = 2
 min_capacity_on_demand     = 1
 
 desired_capacity_spot = 2
-max_capacity_spot     = 1
+max_capacity_spot     = 2
 min_capacity_spot     = 1
 spot_instance_types   = ["c5a.large", "c5a.xlarge", "m5a.large", "m5a.xlarge", "c5.large", "m5.large", "t3a.large", "t3a.xlarge", "t3a.medium"]
 

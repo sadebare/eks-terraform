@@ -12,28 +12,19 @@ is_eks_nodegroup_role_enabled = true
 is_alb_controller_enabled     = true
 addons = [
   {
-    name    = "vpc-cni"
-    version = "v1.13.0-eksbuild.1"
+    name = "vpc-cni"
   },
   {
-    name    = "coredns"
-    version = "v1.13.0-eksbuild.1"
+    name = "coredns"
   },
   {
-    name    = "kube-proxy"
-    version = "v1.13.0-eksbuild.1"
+    name = "kube-proxy"
   },
   {
-    name    = "aws-load-balancer-controller"
-    version = "v2.4.7"
+    name = "aws-efs-csi-driver"
   },
   {
-    name    = "aws-efs-csi-driver"
-    version = "v2.2.0-eksbuild.1"
-  },
-  {
-    name    = "aws-ebs-csi-driver"
-    version = "v1.46.0-eksbuild.1"
+    name = "aws-ebs-csi-driver"
   }
 ]
 desired_capacity_on_demand = 2
