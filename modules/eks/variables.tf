@@ -62,11 +62,6 @@ variable "addons" {
 variable "desired_capacity_on_demand" {
   description = "Desired capacity for on-demand node group"
   type        = number
-
-  validation {
-    condition     = var.desired_capacity_on_demand <= var.max_capacity_on_demand
-    error_message = "desired_capacity_on_demand must be less than or equal to max_capacity_on_demand"
-  }
 }
 
 variable "max_capacity_on_demand" {
@@ -77,21 +72,11 @@ variable "max_capacity_on_demand" {
 variable "min_capacity_on_demand" {
   description = "Minimum capacity for on-demand node group"
   type        = number
-
-  validation {
-    condition     = var.min_capacity_on_demand <= var.desired_capacity_on_demand
-    error_message = "min_capacity_on_demand must be less than or equal to desired_capacity_on_demand"
-  }
 }
 
 variable "desired_capacity_spot" {
   description = "Desired capacity of spot instances"
   type        = number
-
-  validation {
-    condition     = var.desired_capacity_spot <= var.max_capacity_spot
-    error_message = "desired_capacity_spot must be less than or equal to max_capacity_spot"
-  }
 }
 
 variable "max_capacity_spot" {
@@ -102,11 +87,6 @@ variable "max_capacity_spot" {
 variable "min_capacity_spot" {
   description = "Minimum capacity for spot node group"
   type        = number
-
-  validation {
-    condition     = var.min_capacity_spot <= var.desired_capacity_spot
-    error_message = "min_capacity_spot must be less than or equal to desired_capacity_spot"
-  }
 }
 
 variable "spot_instance_types" {
