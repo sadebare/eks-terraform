@@ -22,14 +22,9 @@ addons = [
   },
   {
     name = "aws-efs-csi-driver"
-  },
-#   {
-#     name = "aws-ebs-csi-driver"
-#   },
-  {
-    name = "eks-pod-identity-agent"
   }
 ]
+
 desired_capacity_on_demand = 2
 max_capacity_on_demand     = 2
 min_capacity_on_demand     = 1
