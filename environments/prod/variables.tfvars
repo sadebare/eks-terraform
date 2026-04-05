@@ -1,8 +1,51 @@
-env_name              = "uat"
+env_name              = "prod"
 region                = "us-east-1"
-vpc_cidr              = "172.53.0.0/16"
+vpc_cidr              = "172.54.0.0/16"
 number_of_nat         = 3
-private_subnet_cidr   = ["172.53.1.0/24", "172.53.2.0/24", "172.53.3.0/24"]
-public_subnet_cidr    = ["172.53.4.0/24", "172.53.5.0/24", "172.53.6.0/24"]
+private_subnet_cidr   = ["172.54.1.0/24", "172.54.2.0/24", "172.54.3.0/24"]
+public_subnet_cidr    = ["172.54.4.0/24", "172.54.5.0/24", "172.54.6.0/24"]
 bucket_name           = "shittu-barry-terraform-state"
-statefile_bucket_path = "dev/terraform.tfstate"
+statefile_bucket_path = "prod/terraform.tfstate"
+eks_name   = "prod-eks-cluster"
+is_eks_role_enabled = true
+is_eks_nodegroup_role_enabled = true
+is_alb_controller_enabled = true
+addons = [
+  {
+    name    = "vpc-cni"
+    version = "v1.13.0-eksbuild.1"
+  },
+  {
+    name    = "coredns"
+    version = "v1.13.0-eksbuild.1"
+  },
+  {
+    name    = "kube-proxy"
+    version = "v1.13.0-eksbuild.1"
+  },
+  {
+    name    = "aws-load-balancer-controller"
+    version = "v2.4.7"
+  },
+  {
+    name = "aws-efs-csi-driver"
+    version = "v2.2.0-eksbuild.1"
+  },
+  {
+    name = "aws-ebs-csi-driver"
+    version = "v1.46.0-eksbuild.1"
+  }
+]
+desired_capacity_on_demand = 2
+max_capacity_on_demand = 1
+min_capacity_on_demand = 1
+
+desired_capacity_spot = 2
+max_capacity_spot = 1
+min_capacity_spot = 1
+spot_instance_types = ["c5a.large", "c5a.xlarge", "m5a.large", "m5a.xlarge", "c5.large", "m5.large", "t3a.large", "t3a.xlarge", "t3a.medium"]
+
+tags = {
+  Environment = "prod"
+  Project     = "eks-terraform"
+}

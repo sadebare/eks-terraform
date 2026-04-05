@@ -1,21 +1,43 @@
 # VPC
 resource "aws_vpc" "this" {
-  cidr_block = var.vpc_cidr
+  cidr_block           = var.vpc_cidr
+  enable_dns_hostnames = true
+  enable_dns_support   = true
 
-  tags = {
-    Name = "${var.env_name}-vpc"
-  }
+  tags = merge(
+    var.tags,
+    {
+      Name = "${var.env_name}-vpc"
+    }
+  )
+}
+
+# Internet Gateway
+resource "aws_internet_gateway" "this" {
+  vpc_id = aws_vpc.this.id
+
+  tags = merge(
+    var.tags,
+    {
+      Name = "${var.env_name}-igw"
+    }
+  )
 }
 
 # Public Subnets
 resource "aws_subnet" "public" {
-  count             = length(var.public_subnets)
-  vpc_id            = aws_vpc.this.id
-  cidr_block        = var.public_subnets[count.index]
-  
-  tags = {
-    Name = "${var.env_name}-public-subnet-${count.index}"
-  }
+  count                   = length(var.public_subnets)
+  vpc_id                  = aws_vpc.this.id
+  cidr_block              = var.public_subnets[count.index]
+  availability_zone       = data.aws_availability_zones.available.names[count.index % length(data.aws_availability_zones.available.names)]
+  map_public_ip_on_launch = true
+
+  tags = merge(
+    var.tags,
+    {
+      Name = "${var.env_name}-public-subnet-${count.index + 1}"
+    }
+  )
 }
 
 # Private Subnets
@@ -23,45 +45,50 @@ resource "aws_subnet" "private" {
   count             = length(var.private_subnets)
   vpc_id            = aws_vpc.this.id
   cidr_block        = var.private_subnets[count.index]
-  
-  tags = {
-    Name = "${var.env_name}-private-subnet-${count.index}"
-  }
+  availability_zone = data.aws_availability_zones.available.names[count.index % length(data.aws_availability_zones.available.names)]
+
+  tags = merge(
+    var.tags,
+    {
+      Name = "${var.env_name}-private-subnet-${count.index + 1}"
+    }
+  )
 }
 
-# Internet Gateway
-resource "aws_internet_gateway" "this" {
-  vpc_id = aws_vpc.this.id
-  
-  tags = { 
-    Name = "${var.env_name}-igw" 
-  }
-}
-
-# Elastic IP addresses attached to NAT gateways
+# Elastic IPs for NAT Gateways
 resource "aws_eip" "nat" {
   count  = var.number_of_nat
   domain = "vpc"
-  
-  tags = { 
-    Name = "${var.env_name}-nat-eip-${count.index}" 
-  }
+
+  tags = merge(
+    var.tags,
+    {
+      Name = "${var.env_name}-nat-eip-${count.index + 1}"
+    }
+  )
+
+  depends_on = [aws_internet_gateway.this]
 }
 
-# NAT Gateway to be deployed
+# NAT Gateways
 resource "aws_nat_gateway" "this" {
   count         = var.number_of_nat
-  subnet_id     = aws_subnet.public[count.index].id
   allocation_id = aws_eip.nat[count.index].id
-  
-  tags = { 
-    Name = "${var.env_name}-nat-gw-${count.index}" 
-  }
+  subnet_id     = aws_subnet.public[count.index % length(aws_subnet.public)].id
+
+  tags = merge(
+    var.tags,
+    {
+      Name = "${var.env_name}-nat-${count.index + 1}"
+    }
+  )
+
+  depends_on = [aws_internet_gateway.this]
 }
 
-# Route table for public subnet
+# Public Route Table
 resource "aws_route_table" "public" {
-  vpc_id = aws_vpc.this.id 
+  vpc_id = aws_vpc.this.id
 
   route {
     cidr_block = "0.0.0.0/0"
@@ -69,40 +96,46 @@ resource "aws_route_table" "public" {
   }
 
   tags = merge(
-    { Name = "${var.env_name}-public-rt" },
-    var.tags
+    var.tags,
+    {
+      Name = "${var.env_name}-public-rt"
+    }
   )
 }
 
-# Route table association (public)
+# Public Route Table Association
 resource "aws_route_table_association" "public" {
-  count          = length(var.public_subnets)
+  count          = length(aws_subnet.public)
   subnet_id      = aws_subnet.public[count.index].id
   route_table_id = aws_route_table.public.id
 }
 
-# Route Tables for Private Subnets
-# Dynamically sized based on your number of NATs (1:1 mapping)
+# Private Route Tables (one per NAT Gateway for HA)
 resource "aws_route_table" "private" {
   count  = var.number_of_nat
   vpc_id = aws_vpc.this.id
-  
+
   route {
     cidr_block     = "0.0.0.0/0"
     nat_gateway_id = aws_nat_gateway.this[count.index].id
   }
 
   tags = merge(
-    { Name = "${var.env_name}-private-rt-${count.index}" },
-    var.tags
+    var.tags,
+    {
+      Name = "${var.env_name}-private-rt-${count.index + 1}"
+    }
   )
 }
 
-# Route table association (private)
-# This distributes the 3 private subnets across your NAT gateways
+# Private Route Table Associations
 resource "aws_route_table_association" "private" {
-  count          = length(var.private_subnets)
+  count          = length(aws_subnet.private)
   subnet_id      = aws_subnet.private[count.index].id
-  # Uses the modulo operator (%) to distribute subnets if you have fewer NATs than subnets
   route_table_id = aws_route_table.private[count.index % var.number_of_nat].id
+}
+
+# Data source to get available AZs
+data "aws_availability_zones" "available" {
+  state = "available"
 }
