@@ -7,15 +7,16 @@ resource "random_integer" "random_suffix" {
   max = 9999
 }
 
-# Fetch EKS cluster info
-data "aws_eks_cluster" "this" {
-  name = var.eks_name
-}
+# Fetch EKS cluster info - Commented out to avoid circular dependency during initial deployment
+# Uncomment after EKS cluster is created
+# data "aws_eks_cluster" "this" {
+#   name = var.eks_name
+# }
 
-# Fetch OIDC provider
-data "aws_iam_openid_connect_provider" "this" {
-  url = data.aws_eks_cluster.this.identity[0].oidc[0].issuer
-}
+# Fetch OIDC provider - Commented out to avoid circular dependency during initial deployment
+# data "aws_iam_openid_connect_provider" "this" {
+#   url = data.aws_eks_cluster.this.identity[0].oidc[0].issuer
+# }
 
 resource "aws_iam_role" "eks-cluster-role" {
   count = var.is_eks_role_enabled ? 1 : 0
@@ -78,34 +79,35 @@ resource "aws_iam_role_policy_attachment" "eks-AmazonEBSCSIDriverPolicy" {
   role       = aws_iam_role.eks-nodegroup-role[count.index].name
 }
 
-# ALB Controller Attach Policy
+# ALB Controller Attach Policy - Commented out to avoid circular dependency during initial deployment
 
-resource "aws_iam_role_policy_attachment" "alb-controller-policy-attach" {
-  count      = var.is_alb_controller_enabled ? 1 : 0
-  policy_arn = aws_iam_policy.alb_controller_policy.arn
-  role       = aws_iam_role.alb_controller_role[count.index].name
-}
+# resource "aws_iam_role_policy_attachment" "alb-controller-policy-attach" {
+#   count      = var.is_alb_controller_enabled ? 1 : 0
+#   policy_arn = aws_iam_policy.alb_controller_policy.arn
+#   role       = aws_iam_role.alb_controller_role[count.index].name
+# }
 
 
 
-# OIDC
-data "aws_iam_policy_document" "eks_oidc_assume_role_policy" {
-  statement {
-    actions = ["sts:AssumeRoleWithWebIdentity"]
-    effect  = "Allow"
+# OIDC - Commented out to avoid circular dependency during initial deployment
+# Uncomment after EKS cluster is created
+# data "aws_iam_policy_document" "eks_oidc_assume_role_policy" {
+#   statement {
+#     actions = ["sts:AssumeRoleWithWebIdentity"]
+#     effect  = "Allow"
 
-    condition {
-      test     = "StringEquals"
-      variable = "${replace(data.aws_eks_cluster.this.identity[0].oidc[0].issuer, "https://", "")}:sub"
-      values   = ["system:serviceaccount:default:aws-test"]
-    }
+#     condition {
+#       test     = "StringEquals"
+#       variable = "${replace(data.aws_eks_cluster.this.identity[0].oidc[0].issuer, "https://", "")}:sub"
+#       values   = ["system:serviceaccount:default:aws-test"]
+#     }
 
-    principals {
-      identifiers = [data.aws_iam_openid_connect_provider.this.arn]
-      type        = "Federated"
-    }
-  }
-}
+#     principals {
+#       identifiers = [data.aws_iam_openid_connect_provider.this.arn]
+#       type        = "Federated"
+#     }
+#   }
+# }
 
 resource "aws_iam_role" "eks_oidc" {
   assume_role_policy = data.aws_iam_policy_document.eks_oidc_assume_role_policy.json
